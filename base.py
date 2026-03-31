@@ -67,7 +67,7 @@ class RegressorMixin():
         - score: float
             R^2 score.
         """
-        from sklearn.metrics import r2_score
+        from .metrics.regression import r2_score
         y_pred = self.predict(X)
         return r2_score(y, y_pred)
     
@@ -87,7 +87,7 @@ class ClassifierMixin():
         - score: float
             Mean accuracy of self.predict(X) wrt. y.
         """
-        from sklearn.metrics import accuracy_score
+        from .metrics.classification import accuracy_score
         y_pred = self.predict(X)
         return accuracy_score(y, y_pred)
 
