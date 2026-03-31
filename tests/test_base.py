@@ -1,4 +1,3 @@
-# pyright: reportMissingImports=false
 import sys
 import unittest
 from pathlib import Path
@@ -28,55 +27,55 @@ class DummyEstimator(BaseEstimator):
 
 
 class AddOneTransformer(TransformerMixin):
-    def fit(self, x, y=None):
+    def fit(self, X, y=None):
         self.fitted_ = True
         return self
 
-    def transform(self, x):
-        return np.asarray(x) + 1
+    def transform(self, X):
+        return np.asarray(X) + 1
 
 
 class DummyRegressor(RegressorMixin):
-    def predict(self, x):
-        x = np.asarray(x)
-        return x.sum(axis=1)
+    def predict(self, X):
+        X = np.asarray(X)
+        return X.sum(axis=1)
 
 
 class DummyClassifier(ClassifierMixin):
-    def predict(self, x):
-        x = np.asarray(x)
-        return (x[:, 0] > 0).astype(int)
+    def predict(self, X):
+        X = np.asarray(X)
+        return (X[:, 0] > 0).astype(int)
 
 
 class DummyClusterer(ClusterMixin):
-    def fit(self, x, y=None):
+    def fit(self, X, y=None):
         self.was_fit_ = True
         return self
 
-    def predict(self, x):
-        x = np.asarray(x)
-        return np.zeros(x.shape[0], dtype=int)
+    def predict(self, X):
+        X = np.asarray(X)
+        return np.zeros(X.shape[0], dtype=int)
 
 
 class PipelineTransformer:
-    def fit_transform(self, x, y=None):
+    def fit_transform(self, X, y=None):
         self.fit_transform_called_ = True
-        return np.asarray(x) * 2
+        return np.asarray(X) * 2
 
-    def transform(self, x):
+    def transform(self, X):
         self.transform_called_ = True
-        return np.asarray(x) * 2
+        return np.asarray(X) * 2
 
 
 class PipelineEstimator:
-    def fit(self, x, y=None):
-        self.fit_x_ = np.asarray(x)
+    def fit(self, X, y=None):
+        self.fit_X_ = np.asarray(X)
         self.fit_y_ = np.asarray(y)
         return self
 
-    def predict(self, x):
-        x = np.asarray(x)
-        return x[:, 0]
+    def predict(self, X):
+        X = np.asarray(X)
+        return X[:, 0]
 
 
 class TestBaseEstimator(unittest.TestCase):
@@ -107,34 +106,34 @@ class TestBaseEstimator(unittest.TestCase):
 class TestMixins(unittest.TestCase):
     def test_transformer_mixin_fit_transform(self):
         t = AddOneTransformer()
-        x = np.array([[1, 2], [3, 4]])
+        X = np.array([[1, 2], [3, 4]])
 
-        x_out = t.fit_transform(x)
+        X_out = t.fit_transform(X)
 
-        np.testing.assert_array_equal(x_out, np.array([[2, 3], [4, 5]]))
+        np.testing.assert_array_equal(X_out, np.array([[2, 3], [4, 5]]))
         self.assertTrue(getattr(t, "fitted_", False))
 
     def test_regressor_mixin_score_uses_r2(self):
         reg = DummyRegressor()
-        x = np.array([[1, 0], [1, 1], [2, 1]])
+        X = np.array([[1, 0], [1, 1], [2, 1]])
         y = np.array([1, 2, 3])
 
-        score = reg.score(x, y)
+        score = reg.score(X, y)
         self.assertAlmostEqual(score, 1.0)
 
     def test_classifier_mixin_score_uses_accuracy(self):
         clf = DummyClassifier()
-        x = np.array([[1], [-1], [3], [-2]])
+        X = np.array([[1], [-1], [3], [-2]])
         y = np.array([1, 0, 1, 0])
 
-        score = clf.score(x, y)
+        score = clf.score(X, y)
         self.assertAlmostEqual(score, 1.0)
 
     def test_cluster_mixin_fit_predict(self):
         c = DummyClusterer()
-        x = np.array([[1, 2], [3, 4], [5, 6]])
+        X = np.array([[1, 2], [3, 4], [5, 6]])
 
-        labels = c.fit_predict(x)
+        labels = c.fit_predict(X)
 
         self.assertTrue(getattr(c, "was_fit_", False))
         np.testing.assert_array_equal(labels, np.array([0, 0, 0]))
@@ -146,15 +145,15 @@ class TestBasePipeline(unittest.TestCase):
         estimator = PipelineEstimator()
         pipe = BasePipeline(steps=[("scale", transformer), ("model", estimator)])
 
-        x = np.array([[1, 2], [3, 4]])
+        X = np.array([[1, 2], [3, 4]])
         y = np.array([10, 20])
 
-        pipe.fit(x, y)
+        pipe.fit(X, y)
         self.assertTrue(getattr(transformer, "fit_transform_called_", False))
-        np.testing.assert_array_equal(estimator.fit_x_, np.array([[2, 4], [6, 8]]))
+        np.testing.assert_array_equal(estimator.fit_X_, np.array([[2, 4], [6, 8]]))
         np.testing.assert_array_equal(estimator.fit_y_, y)
 
-        preds = pipe.predict(x)
+        preds = pipe.predict(X)
         self.assertTrue(getattr(transformer, "transform_called_", False))
         np.testing.assert_array_equal(preds, np.array([2, 6]))
 
