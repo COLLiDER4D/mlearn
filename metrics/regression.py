@@ -122,4 +122,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
 
+    if np.any(y_true == 0):
+        raise ValueError("Mean absolute percentage error is undefined when y_true contains zero values.")
+
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100

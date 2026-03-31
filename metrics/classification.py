@@ -135,6 +135,9 @@ def roc_auc_score(y_true, y_scores):
     
     # Calculate AUC using trapezoidal rule
     auc = np.sum((fp[1:] - fp[:-1]) * (tp[1:] + tp[:-1])) / 2.0
+
+    if total_positives == 0 or total_negatives == 0:
+        return 0.0
     
     return auc / (total_positives * total_negatives)
 
