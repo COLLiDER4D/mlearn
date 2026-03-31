@@ -35,70 +35,70 @@ class BaseEstimator():
 
 class TransformerMixin():
     """Mixin class for transformers in the mlearn library."""
-    def fit_transform(self, X, y=None):
+    def fit_transform(self, x, y=None):
         """Fit to data, then transform it.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The data to fit and transform.
         - y: array-like of shape (n_samples,), default=None
             Target values (ignored by default).
 
         Returns:
-        - X_transformed: array-like of shape (n_samples, n_transformed_features)
+        - x_transformed: array-like of shape (n_samples, n_transformed_features)
             The transformed data.
         """
-        self.fit(X, y)
-        return self.transform(X)
+        self.fit(x, y)
+        return self.transform(x)
 
 class RegressorMixin():
     """Mixin class for regressors in the mlearn library."""
 
-    def score(self, X, y):
+    def score(self, x, y):
         """Return the coefficient of determination R^2 of the prediction.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             Test samples.
         - y: array-like of shape (n_samples,)
-            True values for X.
+            True values for x.
 
         Returns:
         - score: float
             R^2 score.
         """
         from .metrics.regression import r2_score
-        y_pred = self.predict(X)
+        y_pred = self.predict(x)
         return r2_score(y, y_pred)
     
 class ClassifierMixin():
     """Mixin class for classifiers in the mlearn library."""
 
-    def score(self, X, y):
+    def score(self, x, y):
         """Return the mean accuracy on the given test data and labels.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             Test samples.
         - y: array-like of shape (n_samples,)
-            True labels for X.
+            True labels for x.
 
         Returns:
         - score: float
-            Mean accuracy of self.predict(X) wrt. y.
+            Mean accuracy of self.predict(x) wrt. y.
         """
         from .metrics.classification import accuracy_score
-        y_pred = self.predict(X)
+        y_pred = self.predict(x)
         return accuracy_score(y, y_pred)
 
 class ClusterMixin():
     """Mixin class for clusterers in the mlearn library."""
 
-    def fit_predict(self, X, y=None):
+    def fit_predict(self, x, y=None):
         """Compute cluster centers and predict cluster index for each sample.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The input samples.
         - y: Ignored
 
@@ -106,18 +106,18 @@ class ClusterMixin():
         - labels: array-like of shape (n_samples,)
             Cluster labels for each point in the dataset.
         """
-        self.fit(X, y)
-        return self.predict(X)
+        self.fit(x, y)
+        return self.predict(x)
     
 class BaseModel(BaseEstimator, ABC):
     """Base class for all models in the mlearn library."""
     
     @abstractmethod
-    def fit(self, X, y=None):
+    def fit(self, x, y=None):
         """Fit the model to data.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The training input samples.
         - y: array-like of shape (n_samples,), default=None
             The target values (class labels in classification, real numbers in regression).
@@ -125,11 +125,11 @@ class BaseModel(BaseEstimator, ABC):
         pass
 
     @abstractmethod
-    def predict(self, X):
+    def predict(self, x):
         """Predict using the model.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The input samples.
 
         Returns:
@@ -143,19 +143,19 @@ class BaseTransformer(BaseEstimator, TransformerMixin, ABC):
     """Base class for all transformers in the mlearn library."""
     
     @abstractmethod
-    def fit_transform(self, X, y=None):
+    def fit_transform(self, x, y=None):
         pass
     
     @abstractmethod
-    def transform(self, X):
+    def transform(self, x):
         """Transform the data.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The input samples.
 
         Returns:
-        - X_transformed: array-like of shape (n_samples, n_transformed_features)
+        - x_transformed: array-like of shape (n_samples, n_transformed_features)
             The transformed data.
         """
         pass
@@ -173,26 +173,26 @@ class BasePipeline(BaseEstimator, ABC):
     def __init__(self, steps):
         self.steps = steps
 
-    def fit(self, X, y=None):
+    def fit(self, x, y=None):
         """Fit the pipeline to data.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The training input samples.
         - y: array-like of shape (n_samples,), default=None
             The target values (class labels in classification, real numbers in regression).
         """        
         for name, step in self.steps[:-1]:
-            X = step.fit_transform(X, y)
+            x = step.fit_transform(x, y)
         
-        self .steps[-1][1].fit(X, y)
+        self .steps[-1][1].fit(x, y)
         return self
     
-    def predict(self, X):
+    def predict(self, x):
         """Predict using the pipeline.
 
         Parameters:
-        - X: array-like of shape (n_samples, n_features)
+        - x: array-like of shape (n_samples, n_features)
             The input samples.
 
         Returns:
@@ -200,6 +200,6 @@ class BasePipeline(BaseEstimator, ABC):
             The predicted values.
         """
         for name, step in self.steps[:-1]:
-            X = step.transform(X)
+            x = step.transform(x)
         
-        return self.steps[-1][1].predict(X)
+        return self.steps[-1][1].predict(x)
