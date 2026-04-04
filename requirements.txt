@@ -1,0 +1,6 @@
+colorama
+iniconfig
+numpy
+pluggy
+Pygments
+pytest
