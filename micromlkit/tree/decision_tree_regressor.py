@@ -19,6 +19,7 @@ class DecisionTreeRegressor(BaseModel, RegressorMixin):
 		self.min_samples_split = min_samples_split
 		self.min_samples_leaf = min_samples_leaf
 		self.random_state = random_state
+		self._rng = None
 
 	def _validate_params(self):
 		if self.max_depth is not None:
@@ -135,8 +136,7 @@ class DecisionTreeRegressor(BaseModel, RegressorMixin):
 			node, X_node, y_node, node_depth = stack.pop()
 			n_samples = X_node.shape[0]
 			node_count += 1
-			if node_depth > max_depth_seen:
-				max_depth_seen = node_depth
+			max_depth_seen = max(max_depth_seen, node_depth)
 
 			should_stop = (
 				(self.max_depth is not None and node_depth >= self.max_depth)

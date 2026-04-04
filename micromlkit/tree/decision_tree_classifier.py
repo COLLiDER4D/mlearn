@@ -19,6 +19,7 @@ class DecisionTreeClassifier(BaseModel, ClassifierMixin):
 		self.min_samples_split = min_samples_split
 		self.min_samples_leaf = min_samples_leaf
 		self.random_state = random_state
+		self._rng = None
 
 	def _validate_params(self):
 		if self.max_depth is not None:
