@@ -142,6 +142,9 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/cluster/dbscan.py`
 - [x] `micromlkit/cluster/kmeans.py`
 - [x] `micromlkit/cluster/__init__.py`
+- [x] `micromlkit/neighbors/knn_classifier.py`
+- [x] `micromlkit/neighbors/knn_regressor.py`
+- [x] `micromlkit/neighbors/__init__.py`
 
 ### Pending implementation (empty files)
 
@@ -149,11 +152,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/ensemble/random_forest.py`
 - [ ] `micromlkit/ensemble/gradient_boosting.py`
 - [ ] `micromlkit/ensemble/__init__.py` (exports)
-
-#### Neighbors
-- [ ] `micromlkit/neighbors/knn_classifier.py`
-- [ ] `micromlkit/neighbors/knn_regressor.py`
-- [ ] `micromlkit/neighbors/__init__.py` (exports)
 
 #### SVM
 - [ ] `micromlkit/svm/svm.py`
