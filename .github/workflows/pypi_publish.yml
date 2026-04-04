@@ -11,8 +11,9 @@ name: Publish Python Package to PyPI
 on:
   release:
     types: [published]
+  workflow_dispatch:
   workflow_run:
-    workflows: ["auto-release"]
+    workflows: ["Auto Release from Branch"]
     types: [completed]
 
 permissions:
