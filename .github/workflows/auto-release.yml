@@ -2,8 +2,8 @@ name: Auto Release from Branch
 
 on:
   push:
-  branches:
-    - "release/**"
+    branches:
+      - "release/**"
 
 jobs:
   release:
