@@ -17,41 +17,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from branch
-        id: version
+      - name: Extract release name from branch
+        id: branch
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
-          VERSION=${BRANCH#release/}
+          RELEASE_NAME=${BRANCH#release/}
+          echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
 
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]; then
-            echo "Invalid release branch version: $VERSION"
-            echo "Expected: release/<semver> (example: release/1.2.3 or release/1.2.3-rc.1)"
+      - name: Extract tag version from pyproject.toml
+        id: package
+        run: |
+          VERSION=$(grep -m1 '^version = ' pyproject.toml | sed -E 's/version = "([^"]+)"/\1/')
+          if [ -z "$VERSION" ]; then
+            echo "Could not read project version from pyproject.toml"
             exit 1
           fi
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Verify pyproject version matches branch version
-        run: |
-          python - <<'PY'
-          import pathlib
-          import tomllib
-
-          pyproject = pathlib.Path("pyproject.toml")
-          data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-          project_version = data["project"]["version"]
-
-          import os
-          branch_version = os.environ["BRANCH_VERSION"]
-          if project_version != branch_version:
-              raise SystemExit(
-                  f"pyproject version ({project_version}) does not match release branch version ({branch_version})."
-              )
-          print(f"Version check passed: {project_version}")
-          PY
-        env:
-          BRANCH_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Create Git tag if missing
         id: tag
@@ -59,7 +41,7 @@ jobs:
           git fetch --tags --force
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          TAG="${{ steps.version.outputs.tag }}"
+          TAG="${{ steps.package.outputs.tag }}"
 
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists; skipping tag creation."
@@ -86,8 +68,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: Release ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.package.outputs.tag }}
+          name: Release ${{ steps.branch.outputs.release_name }}
           generate_release_notes: true
           overwrite_files: true
           files: dist/*
