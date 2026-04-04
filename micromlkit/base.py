@@ -1,4 +1,4 @@
-from abc import ABC, ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 
 class BaseEstimator():
@@ -185,7 +185,7 @@ class BasePipeline(BaseEstimator, ABC):
         for name, step in self.steps[:-1]:
             X = step.fit_transform(X, y)
         
-        self .steps[-1][1].fit(X, y)
+        self.steps[-1][1].fit(X, y)
         return self
     
     def predict(self, X):
