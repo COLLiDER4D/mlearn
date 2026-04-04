@@ -5,6 +5,7 @@ from . import cluster
 from . import neighbors
 from . import pipeline
 from . import tree
+from . import svm
 
 __all__ = [
 	"linear_model",
@@ -14,4 +15,5 @@ __all__ = [
 	"neighbors",
 	"pipeline",
 	"tree",
+	"svm",
 ]
