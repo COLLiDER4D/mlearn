@@ -119,6 +119,8 @@ class RandomForestClassifier(BaseModel, ClassifierMixin):
 		n_samples, n_features = X.shape
 		if n_samples == 0:
 			raise ValueError("X must contain at least one sample.")
+		if n_features == 0:
+			raise ValueError("X must contain at least one feature.")
 
 		self.n_features_in_ = n_features
 		self.classes_ = np.unique(y)
@@ -127,7 +129,6 @@ class RandomForestClassifier(BaseModel, ClassifierMixin):
 		rng = np.random.default_rng(self.random_state)
 		self.estimators_ = []
 		self.feature_indices_ = []
-		self.bootstrap_indices_ = []
 
 		for _ in range(self.n_estimators):
 			feature_indices = rng.choice(n_features, size=self.max_features_, replace=False)
@@ -148,7 +149,6 @@ class RandomForestClassifier(BaseModel, ClassifierMixin):
 
 			self.estimators_.append(estimator)
 			self.feature_indices_.append(feature_indices)
-			self.bootstrap_indices_.append(bootstrap_indices)
 
 		return self
 
@@ -294,6 +294,8 @@ class RandomForestRegressor(BaseModel, RegressorMixin):
 		n_samples, n_features = X.shape
 		if n_samples == 0:
 			raise ValueError("X must contain at least one sample.")
+		if n_features == 0:
+			raise ValueError("X must contain at least one feature.")
 
 		self.n_features_in_ = n_features
 		self.max_features_ = self._resolve_max_features(n_features)
@@ -301,7 +303,6 @@ class RandomForestRegressor(BaseModel, RegressorMixin):
 		rng = np.random.default_rng(self.random_state)
 		self.estimators_ = []
 		self.feature_indices_ = []
-		self.bootstrap_indices_ = []
 
 		for _ in range(self.n_estimators):
 			feature_indices = rng.choice(n_features, size=self.max_features_, replace=False)
@@ -322,7 +323,6 @@ class RandomForestRegressor(BaseModel, RegressorMixin):
 
 			self.estimators_.append(estimator)
 			self.feature_indices_.append(feature_indices)
-			self.bootstrap_indices_.append(bootstrap_indices)
 
 		return self
 
