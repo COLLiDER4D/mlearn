@@ -148,6 +148,8 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/tree/decision_tree_classifier.py`
 - [x] `micromlkit/tree/decision_tree_regressor.py`
 - [x] `micromlkit/tree/__init__.py`
+- [x] `micromlkit/svm/svm.py`
+- [x] `micromlkit/svm/__init__.py`
 
 ### Pending implementation (empty files)
 
@@ -155,10 +157,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/ensemble/random_forest.py`
 - [ ] `micromlkit/ensemble/gradient_boosting.py`
 - [ ] `micromlkit/ensemble/__init__.py` (exports)
-
-#### SVM
-- [ ] `micromlkit/svm/svm.py`
-- [ ] `micromlkit/svm/__init__.py` (exports)
 
 #### Utils
 - [ ] `micromlkit/utils/math.py`
