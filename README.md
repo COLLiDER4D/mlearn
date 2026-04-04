@@ -1,167 +1,122 @@
 # microMlKit
 
-`microMlKit` is a lightweight, educational machine learning toolkit built with NumPy and a scikit-learn-inspired API.
+`microMlKit` is a lightweight, educational machine learning library built with NumPy and a scikit-learn-inspired API.
 
-> Package name for imports and installation metadata: `micromlkit` (all lowercase).
+> Package/import name: `micromlkit` (lowercase)
 
-## What this project is
+## Overview
 
-This library is intended for learning, experimentation, and understanding ML internals—not production workloads.
+`micromlkit` is designed for learning, experimentation, and understanding core ML algorithms through readable implementations.
 
-It includes:
+It provides:
 
-- Estimator and mixin base classes
-- Linear models
-- Clustering, tree, ensemble, neighbors, SVM, and decomposition modules
-- Preprocessing helpers
-- Classification and regression metrics
-- Model selection helpers (`train_test_split`, `KFold`, `StratifiedKFold`, cross-validation, grid search)
+- A familiar estimator workflow (`fit`, `predict`, `transform`)
+- Reusable base classes and mixins
+- Core algorithms across regression, classification, clustering, decomposition, trees, SVM, ensemble, and neighbors
+- Preprocessing, metrics, model selection, and pipeline utilities
 
 ## Installation
 
-Install from PyPI:
+### Install from PyPI
 
 ```bash
 pip install micromlkit
 ```
 
-## Quick start
+### Install from source (development)
 
-### Linear regression example
+```bash
+git clone <repository-url>
+cd microMlKit
+pip install -e .[dev]
+```
+
+## Quick Start
+
+### Regression with preprocessing + pipeline
 
 ```python
 import numpy as np
 
-from micromlkit.linear_model.linear_regression import LinearRegression
-from micromlkit.metrics.regression import mean_squared_error, r2_score
-from micromlkit.model_selection.split import train_test_split
+from micromlkit.linear_model import LinearRegression
+from micromlkit.metrics import mean_squared_error, r2_score
+from micromlkit.model_selection import train_test_split
+from micromlkit.pipeline import Pipeline
+from micromlkit.preprocessing import StandardScaler
 
 X = np.array([[1.0], [2.0], [3.0], [4.0], [5.0]])
-y = np.array([2.0, 4.1, 6.1, 8.2, 10.1])
+y = np.array([2.0, 4.1, 6.1, 8.0, 10.2])
 
 X_train, X_test, y_train, y_test = train_test_split(
-	X, y, test_size=0.4, random_state=42
+    X, y, test_size=0.4, random_state=42
 )
 
-model = LinearRegression().fit(X_train, y_train)
-predictions = model.predict(X_test)
+model = Pipeline([
+    ("scaler", StandardScaler()),
+    ("regressor", LinearRegression()),
+])
 
-print("MSE:", mean_squared_error(y_test, predictions))
-print("R2:", r2_score(y_test, predictions))
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R2:", r2_score(y_test, y_pred))
 ```
 
-### Base pipeline example
-
-`BasePipeline` (from `micromlkit.base`) supports a simple transform-then-estimate flow.
+### Classification example
 
 ```python
 import numpy as np
 
-from micromlkit.base import BasePipeline
+from micromlkit.linear_model import LogisticRegression
+from micromlkit.metrics import accuracy_score
 
+X = np.array([[0.1], [0.3], [0.6], [0.8]])
+y = np.array([0, 0, 1, 1])
 
-class DoubleTransformer:
-	def fit_transform(self, X, y=None):
-		return np.asarray(X) * 2
+clf = LogisticRegression(learning_rate=0.1, n_iterations=2000)
+clf.fit(X, y)
+pred = clf.predict(X)
 
-	def transform(self, X):
-		return np.asarray(X) * 2
-
-
-class FirstColumnModel:
-	def fit(self, X, y=None):
-		return self
-
-	def predict(self, X):
-		X = np.asarray(X)
-		return X[:, 0]
-
-
-pipeline = BasePipeline(
-	steps=[("double", DoubleTransformer()), ("model", FirstColumnModel())]
-)
-
-X = np.array([[1, 2], [3, 4]])
-y = np.array([10, 20])
-
-pipeline.fit(X, y)
-print(pipeline.predict(X))
+print("Accuracy:", accuracy_score(y, pred))
 ```
 
-## Module highlights
+## Implemented Modules
 
-- `micromlkit.base`: `BaseEstimator`, `BaseModel`, `BaseTransformer`, mixins, `BasePipeline`
-- `micromlkit.linear_model`: `LinearRegression`, `Lasso`, `Ridge`, `LogisticRegression`
-- `micromlkit.metrics`: classification + regression metrics
-- `micromlkit.model_selection`: splitters, cross-validation, search utilities
-- `micromlkit.preprocessing`: encoder, imputer, scaler helpers
-- `micromlkit.cluster`, `tree`, `ensemble`, `neighbors`, `svm`, `decomposition`
+| Module | Key Components |
+|---|---|
+| `micromlkit.base` | `BaseEstimator`, `BaseModel`, `BaseTransformer`, mixins, `BasePipeline` |
+| `micromlkit.linear_model` | `LinearRegression`, `Ridge`, `Lasso`, `LogisticRegression` |
+| `micromlkit.cluster` | `KMeans`, `DBSCAN`, `AgglomerativeClustering` |
+| `micromlkit.tree` | `DecisionTreeClassifier`, `DecisionTreeRegressor` |
+| `micromlkit.ensemble` | `RandomForestClassifier`, `RandomForestRegressor`, `GradientBoostingClassifier`, `GradientBoostingRegressor` |
+| `micromlkit.neighbors` | `KNNClassifier`, `KNNRegressor` |
+| `micromlkit.svm` | `SVC`, `SVR` |
+| `micromlkit.decomposition` | `PCA` |
+| `micromlkit.preprocessing` | `StandardScaler`, `SimpleImputer`, `LabelEncoder` |
+| `micromlkit.metrics` | classification + regression metrics |
+| `micromlkit.model_selection` | `train_test_split`, `KFold`, `StratifiedKFold`, `cross_val_score`, `ParameterGrid`, `GridSearchCV` |
+| `micromlkit.pipeline` | `Pipeline` |
+| `micromlkit.utils` | kernel/math and validation helpers |
+
+## Project Scope
+
+- **Goal:** educational readability and practical experimentation
+- **Runtime dependency:** NumPy
+- **Python version:** `>=3.9`
+- **Production note:** this project is intended for learning and small-scale experimentation rather than production-grade ML workloads
 
 ## Testing
 
 Run the test suite:
 
 ```bash
-pytest
+pytest -ra
 ```
 
-## Current status
+Latest local verification in this repository: **157 passed**.
 
-- API is intentionally minimal and may evolve.
-- Some advanced conveniences (for example, richer nested-parameter handling and expanded pipeline ergonomics) are still limited.
-
-## Implementation checklist
-
-Status below is based on current source files in `micromlkit/`.
-
-### Implemented (non-empty)
-
-- [x] `micromlkit/__init__.py`
-- [x] `micromlkit/base.py`
-- [x] `micromlkit/linear_model/linear_regression.py`
-- [x] `micromlkit/linear_model/lasso.py`
-- [x] `micromlkit/linear_model/ridge.py`
-- [x] `micromlkit/linear_model/logistic_regression.py`
-- [x] `micromlkit/linear_model/__init__.py`
-- [x] `micromlkit/metrics/classification.py`
-- [x] `micromlkit/metrics/regression.py`
-- [x] `micromlkit/metrics/__init__.py`
-- [x] `micromlkit/model_selection/split.py`
-- [x] `micromlkit/model_selection/cross_validation.py`
-- [x] `micromlkit/model_selection/search.py`
-- [x] `micromlkit/model_selection/__init__.py`
-- [x] `micromlkit/preprocessing/encoder.py`
-- [x] `micromlkit/preprocessing/imputer.py`
-- [x] `micromlkit/preprocessing/scaler.py`
-- [x] `micromlkit/preprocessing/__init__.py`
-- [x] `micromlkit/decomposition/pca.py`
-- [x] `micromlkit/decomposition/__init__.py`
-- [x] `micromlkit/pipeline/pipeline.py`
-- [x] `micromlkit/pipeline/__init__.py`
-- [x] `micromlkit/cluster/agglomerative.py`
-- [x] `micromlkit/cluster/dbscan.py`
-- [x] `micromlkit/cluster/kmeans.py`
-- [x] `micromlkit/cluster/__init__.py`
-- [x] `micromlkit/neighbors/knn_classifier.py`
-- [x] `micromlkit/neighbors/knn_regressor.py`
-- [x] `micromlkit/neighbors/__init__.py`
-- [x] `micromlkit/tree/decision_tree_classifier.py`
-- [x] `micromlkit/tree/decision_tree_regressor.py`
-- [x] `micromlkit/tree/__init__.py`
-- [x] `micromlkit/svm/svm.py`
-- [x] `micromlkit/svm/__init__.py`
-- [x] `micromlkit/ensemble/random_forest.py`
-- [x] `micromlkit/ensemble/gradient_boosting.py`
-- [x] `micromlkit/ensemble/__init__.py`
-
-### Pending implementation (empty files)
-
-#### Utils
-- [ ] `micromlkit/utils/math.py`
-- [ ] `micromlkit/utils/validation.py`
-- [ ] `micromlkit/utils/__init__.py` (exports)
-
-## Project layout
+## Repository Structure
 
 ```text
 micromlkit/
@@ -176,7 +131,10 @@ micromlkit/
 ├── pipeline/
 ├── preprocessing/
 ├── svm/
-└── tree/
+├── tree/
+└── utils/
 ```
 
+## License
 
+See the [`LICENSE`](./LICENSE) file in the repository root.

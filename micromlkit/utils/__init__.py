@@ -1,3 +1,14 @@
+"""Utility math and validation helpers used across :mod:`micromlkit`.
+
+Examples
+--------
+>>> from micromlkit.utils import sigmoid, validate_positive_integer
+>>> round(float(sigmoid(0.0)), 1)
+0.5
+>>> validate_positive_integer(3, "n_neighbors")
+3
+"""
+
 from .math import compute_kernel, linear_kernel, rbf_kernel, sigmoid, soft_threshold
 from .validation import (
 	check_is_fitted,
