@@ -58,7 +58,7 @@ class AgglomerativeClustering(BaseModel, ClusterMixin):
 	def fit(self, X, y=None):
 		"""Fit agglomerative clustering model."""
 		self._validate_params()
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		n_samples, n_features = X.shape
 
 		if self.n_clusters > n_samples:
@@ -132,7 +132,7 @@ class AgglomerativeClustering(BaseModel, ClusterMixin):
 				"This AgglomerativeClustering instance is not fitted yet. Call 'fit' first."
 			)
 
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		validate_feature_count(X, self.n_features_in_, "AgglomerativeClustering")
 
 		distances = pairwise_distances(

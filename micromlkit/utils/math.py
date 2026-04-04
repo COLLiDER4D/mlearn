@@ -1,5 +1,7 @@
 import numpy as np
 
+from .validation import validate_positive_number
+
 
 def sigmoid(z):
 	"""Numerically stable sigmoid."""
@@ -23,6 +25,7 @@ def linear_kernel(X, Y):
 
 def rbf_kernel(X, Y, gamma):
 	"""RBF kernel matrix."""
+	gamma = validate_positive_number(gamma, "gamma")
 	X_norm = np.sum(X ** 2, axis=1, keepdims=True)
 	Y_norm = np.sum(Y ** 2, axis=1, keepdims=True).T
 	squared_distances = np.maximum(X_norm + Y_norm - 2.0 * (X @ Y.T), 0.0)

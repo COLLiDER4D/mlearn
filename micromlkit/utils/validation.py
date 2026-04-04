@@ -1,11 +1,17 @@
 import numpy as np
 
 
-def ensure_2d_float_array(X, name="X", require_non_empty=False):
-	"""Validate and return X as a 2D float NumPy array."""
+def _validate_2d_float_array(X, name="X"):
+	"""Return X as a 2D float NumPy array after core shape validation."""
 	X = np.asarray(X, dtype=float)
 	if X.ndim != 2:
 		raise ValueError(f"{name} must be a 2D array of shape (n_samples, n_features).")
+	return X
+
+
+def ensure_2d_float_array(X, name="X", require_non_empty=False):
+	"""Validate and return X as a 2D float NumPy array."""
+	X = _validate_2d_float_array(X, name=name)
 
 	if require_non_empty and (X.shape[0] == 0 or X.shape[1] == 0):
 		raise ValueError(f"{name} must contain at least one sample and one feature.")

@@ -50,7 +50,7 @@ class DBSCAN(BaseModel, ClusterMixin):
 	def fit(self, X, y=None):
 		"""Fit DBSCAN model."""
 		self._validate_params()
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		n_samples, n_features = X.shape
 
 		distances = pairwise_distances(X, X, metric=self.metric_, p=self.p_)
@@ -125,7 +125,7 @@ class DBSCAN(BaseModel, ClusterMixin):
 		if not hasattr(self, "labels_"):
 			raise ValueError("This DBSCAN instance is not fitted yet. Call 'fit' first.")
 
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		validate_feature_count(X, self.n_features_in_, "DBSCAN")
 
 		if self._core_samples_.shape[0] == 0:

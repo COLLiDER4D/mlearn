@@ -1,5 +1,7 @@
 import numpy as np
 
+from ..utils.validation import ensure_2d_float_array, validate_feature_count
+
 
 _ALLOWED_METRICS = {
     "euclidean",
@@ -8,15 +10,6 @@ _ALLOWED_METRICS = {
     "chebyshev",
     "minkowski",
 }
-
-
-def ensure_2d_float_array(X, name="X"):
-    X = np.asarray(X, dtype=float)
-    if X.ndim != 2:
-        raise ValueError(f"{name} must be a 2D array of shape (n_samples, n_features).")
-    if X.shape[0] == 0 or X.shape[1] == 0:
-        raise ValueError(f"{name} must contain at least one sample and one feature.")
-    return X
 
 
 def validate_metric(metric):
@@ -45,14 +38,6 @@ def validate_minkowski_p(metric, p):
         raise ValueError("p must be greater than or equal to 1 for minkowski metric.")
 
     return p
-
-
-def validate_feature_count(X, n_features_in, estimator_name):
-    if X.shape[1] != n_features_in:
-        raise ValueError(
-            f"X has {X.shape[1]} features, but {estimator_name} was fitted with "
-            f"{n_features_in} features."
-        )
 
 
 def pairwise_distances(X, Y, metric="euclidean", p=2.0):

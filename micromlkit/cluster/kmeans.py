@@ -67,7 +67,7 @@ class KMeans(BaseModel, ClusterMixin):
 	def fit(self, X, y=None):
 		"""Fit K-Means model."""
 		self._validate_params()
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		n_samples, n_features = X.shape
 
 		if self.n_clusters > n_samples:
@@ -130,7 +130,7 @@ class KMeans(BaseModel, ClusterMixin):
 		if not hasattr(self, "cluster_centers_"):
 			raise ValueError("This KMeans instance is not fitted yet. Call 'fit' first.")
 
-		X = ensure_2d_float_array(X)
+		X = ensure_2d_float_array(X, require_non_empty=True)
 		validate_feature_count(X, self.n_features_in_, "KMeans")
 
 		distances = pairwise_distances(X, self.cluster_centers_, metric=self.metric_, p=self.p_)
