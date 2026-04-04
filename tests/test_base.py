@@ -11,7 +11,7 @@ for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from src.base import (
+from micromlkit.base import (
     BaseEstimator,
     ClassifierMixin,
     ClusterMixin,

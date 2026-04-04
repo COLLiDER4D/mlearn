@@ -12,9 +12,9 @@ for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from src.model_selection.split import KFold, train_test_split
-from src.model_selection.cross_validation import cross_val_score
-from src.model_selection.search import GridSearchCV, ParameterGrid
+from micromlkit.model_selection.split import KFold, train_test_split
+from micromlkit.model_selection.cross_validation import cross_val_score
+from micromlkit.model_selection.search import GridSearchCV, ParameterGrid
 
 
 class DummyClassifier:

@@ -13,7 +13,7 @@ for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from src.metrics.classification import (
+from micromlkit.metrics.classification import (
     accuracy_score,
     f1_score,
     log_loss,
@@ -21,7 +21,7 @@ from src.metrics.classification import (
     recall_score,
     roc_auc_score,
 )
-from src.metrics.regression import (
+from micromlkit.metrics.regression import (
     mean_absolute_error,
     mean_absolute_percentage_error,
     mean_squared_error,
