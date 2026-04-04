@@ -129,6 +129,10 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/model_selection/split.py`
 - [x] `micromlkit/model_selection/cross_validation.py`
 - [x] `micromlkit/model_selection/search.py`
+- [x] `micromlkit/preprocessing/encoder.py`
+- [x] `micromlkit/preprocessing/imputer.py`
+- [x] `micromlkit/preprocessing/scaler.py`
+- [x] `micromlkit/preprocessing/__init__.py`
 
 ### Pending implementation (empty files)
 
@@ -155,12 +159,6 @@ Status below is based on current source files in `micromlkit/`.
 #### Pipeline
 - [ ] `micromlkit/pipeline/pipeline.py`
 - [ ] `micromlkit/pipeline/__init__.py` (exports)
-
-#### Preprocessing
-- [ ] `micromlkit/preprocessing/encoder.py`
-- [ ] `micromlkit/preprocessing/imputer.py`
-- [ ] `micromlkit/preprocessing/scaler.py`
-- [ ] `micromlkit/preprocessing/__init__.py` (exports)
 
 #### SVM
 - [ ] `micromlkit/svm/svm.py`
