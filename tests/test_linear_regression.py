@@ -6,11 +6,13 @@ from pathlib import Path
 import numpy as np
 
 # Ensure package import works when running tests from repository root.
-ROOT_PARENT = Path(__file__).resolve().parents[2]
-if str(ROOT_PARENT) not in sys.path:
-    sys.path.insert(0, str(ROOT_PARENT))
+ROOT_PARENT = Path(__file__).resolve().parents[2]  # .../capstone
+PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/microMlKit
+for p in (ROOT_PARENT, PKG_ROOT):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
-from mlearn.linear_model.linear_regression import LinearRegression
+from src.linear_model.linear_regression import LinearRegression
 
 
 class TestLinearRegression(unittest.TestCase):

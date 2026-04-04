@@ -1,6 +1,6 @@
 import numpy as np
 
-from model_selection.split import KFold
+from .split import KFold
 
 
 def cross_val_score(estimator, X, y, cv, scoring):

@@ -14,21 +14,61 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Extract version from branch
         id: version
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
           VERSION=${BRANCH#release/}
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]; then
+            echo "Invalid release branch version: $VERSION"
+            echo "Expected: release/<semver> (example: release/1.2.3 or release/1.2.3-rc.1)"
+            exit 1
+          fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create Git tag
+      - name: Verify pyproject version matches branch version
         run: |
+          python - <<'PY'
+          import pathlib
+          import tomllib
+
+          pyproject = pathlib.Path("pyproject.toml")
+          data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+          project_version = data["project"]["version"]
+
+          import os
+          branch_version = os.environ["BRANCH_VERSION"]
+          if project_version != branch_version:
+              raise SystemExit(
+                  f"pyproject version ({project_version}) does not match release branch version ({branch_version})."
+              )
+          print(f"Version check passed: {project_version}")
+          PY
+        env:
+          BRANCH_VERSION: ${{ steps.version.outputs.version }}
+
+      - name: Create Git tag if missing
+        id: tag
+        run: |
+          git fetch --tags --force
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git tag ${{ steps.version.outputs.tag }}
-          git push origin ${{ steps.version.outputs.tag }}
+          TAG="${{ steps.version.outputs.tag }}"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; skipping tag creation."
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -44,10 +84,12 @@ jobs:
         run: python -m build
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          overwrite_files: true
           files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

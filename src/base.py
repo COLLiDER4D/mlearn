@@ -2,7 +2,7 @@ from abc import ABC, ABC, abstractmethod
 
 
 class BaseEstimator():
-    """Simple base class for all estimators in the mlearn library."""
+    """Simple base class for all estimators in the microMlKit library."""
     # TODO: Add support for nested parameters (e.g., for pipelines) if needed.
     def get_params(self):
         """Return model hyperparameters as a dict.
@@ -34,7 +34,7 @@ class BaseEstimator():
         return self
 
 class TransformerMixin():
-    """Mixin class for transformers in the mlearn library."""
+    """Mixin class for transformers in the microMlKit library."""
     def fit_transform(self, X, y=None):
         """Fit to data, then transform it.
 
@@ -52,7 +52,7 @@ class TransformerMixin():
         return self.transform(X)
 
 class RegressorMixin():
-    """Mixin class for regressors in the mlearn library."""
+    """Mixin class for regressors in the microMlKit library."""
 
     def score(self, X, y):
         """Return the coefficient of determination R^2 of the prediction.
@@ -72,7 +72,7 @@ class RegressorMixin():
         return r2_score(y, y_pred)
     
 class ClassifierMixin():
-    """Mixin class for classifiers in the mlearn library."""
+    """Mixin class for classifiers in the microMlKit library."""
 
     def score(self, X, y):
         """Return the mean accuracy on the given test data and labels.
@@ -92,7 +92,7 @@ class ClassifierMixin():
         return accuracy_score(y, y_pred)
 
 class ClusterMixin():
-    """Mixin class for clusterers in the mlearn library."""
+    """Mixin class for clusterers in the microMlKit library."""
 
     def fit_predict(self, X, y=None):
         """Compute cluster centers and predict cluster index for each sample.
@@ -110,7 +110,7 @@ class ClusterMixin():
         return self.predict(X)
     
 class BaseModel(BaseEstimator, ABC):
-    """Base class for all models in the mlearn library."""
+    """Base class for all models in the microMlKit library."""
     
     @abstractmethod
     def fit(self, X, y=None):
@@ -140,7 +140,7 @@ class BaseModel(BaseEstimator, ABC):
 
 
 class BaseTransformer(BaseEstimator, TransformerMixin, ABC):
-    """Base class for all transformers in the mlearn library."""
+    """Base class for all transformers in the microMlKit library."""
     
     @abstractmethod
     def fit_transform(self, X, y=None):
@@ -161,7 +161,7 @@ class BaseTransformer(BaseEstimator, TransformerMixin, ABC):
         pass
 
 class BasePipeline(BaseEstimator, ABC):
-    """Simple base class for pipelines in the mlearn library.
+    """Simple base class for pipelines in the microMlKit library.
 
      TODO:
     - Implement full pipeline logic

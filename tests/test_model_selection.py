@@ -7,14 +7,14 @@ import numpy as np
 
 # Ensure imports work with this repository's current package layout.
 ROOT_PARENT = Path(__file__).resolve().parents[2]  # .../capstone
-PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/mlearn
+PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/microMlKit
 for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from model_selection.split import KFold, train_test_split
-from model_selection.cross_validation import cross_val_score
-from model_selection.search import GridSearchCV, ParameterGrid
+from src.model_selection.split import KFold, train_test_split
+from src.model_selection.cross_validation import cross_val_score
+from src.model_selection.search import GridSearchCV, ParameterGrid
 
 
 class DummyClassifier:
@@ -128,7 +128,7 @@ class TestSearch(unittest.TestCase):
         def fake_cross_val_score(estimator, X, y, cv):
             return score_map[estimator.threshold]
 
-        with patch("model_selection.search.cross_val_score", side_effect=fake_cross_val_score):
+        with patch("src.model_selection.search.cross_val_score", side_effect=fake_cross_val_score):
             gs = GridSearchCV(estimator=est, param_grid={"threshold": [0.2, 0.5, 0.8]}, cv=2)
             gs.fit(X, y)
 
