@@ -119,6 +119,9 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/__init__.py`
 - [x] `micromlkit/base.py`
 - [x] `micromlkit/linear_model/linear_regression.py`
+- [x] `micromlkit/linear_model/lasso.py`
+- [x] `micromlkit/linear_model/ridge.py`
+- [x] `micromlkit/linear_model/logistic_regression.py`
 - [x] `micromlkit/linear_model/__init__.py`
 - [x] `micromlkit/metrics/classification.py`
 - [x] `micromlkit/metrics/regression.py`
@@ -143,11 +146,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/ensemble/random_forest.py`
 - [ ] `micromlkit/ensemble/gradient_boosting.py`
 - [ ] `micromlkit/ensemble/__init__.py` (exports)
-
-#### Linear model
-- [ ] `micromlkit/linear_model/lasso.py`
-- [ ] `micromlkit/linear_model/ridge.py`
-- [ ] `micromlkit/linear_model/logistic_regression.py`
 
 #### Neighbors
 - [ ] `micromlkit/neighbors/knn_classifier.py`
