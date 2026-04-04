@@ -22,7 +22,7 @@ It includes:
 Install from PyPI:
 
 ```bash
-pip install micromlkit==0.1.0
+pip install micromlkit
 ```
 
 ## Quick start
