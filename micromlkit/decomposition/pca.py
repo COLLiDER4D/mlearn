@@ -1,6 +1,7 @@
 import numpy as np
 
 from ..base import BaseTransformer
+from ..utils.validation import check_is_fitted, ensure_2d_float_array, validate_feature_count
 
 
 class PCA(BaseTransformer):
@@ -17,12 +18,7 @@ class PCA(BaseTransformer):
 		self.n_components = n_components
 
 	def _validate_X(self, X):
-		X = np.asarray(X, dtype=float)
-		if X.ndim != 2:
-			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
-		if X.shape[0] == 0 or X.shape[1] == 0:
-			raise ValueError("X must contain at least one sample and one feature.")
-		return X
+		return ensure_2d_float_array(X, require_non_empty=True)
 
 	def _resolve_n_components(self, n_samples, n_features):
 		max_components = min(n_samples, n_features)
@@ -84,14 +80,9 @@ class PCA(BaseTransformer):
 
 	def transform(self, X):
 		"""Apply dimensionality reduction to X."""
-		if not hasattr(self, "components_") or not hasattr(self, "mean_"):
-			raise ValueError("This PCA instance is not fitted yet. Call 'fit' first.")
+		check_is_fitted(self, ("components_", "mean_"))
 
 		X = self._validate_X(X)
-		if X.shape[1] != self.n_features_in_:
-			raise ValueError(
-				f"X has {X.shape[1]} features, but PCA was fitted with "
-				f"{self.n_features_in_} features."
-			)
+		validate_feature_count(X, self.n_features_in_, "PCA")
 
 		return (X - self.mean_) @ self.components_.T
