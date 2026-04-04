@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "microMlKit"
+version = "0.1.0"
+description = "Mini machine learning library"
+authors = [{ name = "Probal Deep Saikia", email="probaldeepsaikia@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
