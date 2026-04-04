@@ -121,6 +121,10 @@ class AgglomerativeClustering(BaseModel, ClusterMixin):
 
 		return self
 
+	def fit_predict(self, X, y=None):
+		"""Fit model and return training-set cluster labels from the hierarchy."""
+		return self.fit(X, y).labels_
+
 	def predict(self, X):
 		"""Predict cluster labels for unseen samples via nearest representative."""
 		if not hasattr(self, "labels_"):

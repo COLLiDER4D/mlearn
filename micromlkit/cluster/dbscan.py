@@ -112,6 +112,10 @@ class DBSCAN(BaseModel, ClusterMixin):
 
 		return self
 
+	def fit_predict(self, X, y=None):
+		"""Fit model and return training-set cluster labels from the density expansion."""
+		return self.fit(X, y).labels_
+
 	def predict(self, X):
 		"""Predict labels for unseen samples.
 

@@ -35,7 +35,7 @@ def validate_metric(metric):
 
 def validate_minkowski_p(metric, p):
     if metric != "minkowski":
-        return float(p)
+        return 2.0
 
     if isinstance(p, bool) or not isinstance(p, (int, float, np.integer, np.floating)):
         raise ValueError("p must be a numeric value greater than or equal to 1 for minkowski metric.")
@@ -68,19 +68,20 @@ def pairwise_distances(X, Y, metric="euclidean", p=2.0):
     metric = validate_metric(metric)
     p = validate_minkowski_p(metric, p)
 
-    diff = X[:, np.newaxis, :] - Y[np.newaxis, :, :]
+    if metric != "cosine":
+        diff = X[:, np.newaxis, :] - Y[np.newaxis, :, :]
 
-    if metric == "euclidean":
-        return np.sqrt(np.sum(diff ** 2, axis=2))
+        if metric == "euclidean":
+            return np.sqrt(np.sum(diff ** 2, axis=2))
 
-    if metric == "manhattan":
-        return np.sum(np.abs(diff), axis=2)
+        if metric == "manhattan":
+            return np.sum(np.abs(diff), axis=2)
 
-    if metric == "chebyshev":
-        return np.max(np.abs(diff), axis=2)
+        if metric == "chebyshev":
+            return np.max(np.abs(diff), axis=2)
 
-    if metric == "minkowski":
-        return np.sum(np.abs(diff) ** p, axis=2) ** (1.0 / p)
+        if metric == "minkowski":
+            return np.sum(np.abs(diff) ** p, axis=2) ** (1.0 / p)
 
     # cosine distance
     dot_products = X @ Y.T
