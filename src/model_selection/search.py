@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from model_selection.cross_validation import cross_val_score
+from .cross_validation import cross_val_score
 
 
 class ParameterGrid:
