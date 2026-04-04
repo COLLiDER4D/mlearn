@@ -1,3 +1,16 @@
+"""Top-level package for :mod:`micromlkit`.
+
+This package exposes educational machine-learning modules built with NumPy and
+a scikit-learn-inspired API.
+
+Examples
+--------
+>>> from micromlkit import linear_model
+>>> model = linear_model.LinearRegression()
+>>> isinstance(model.get_params(), dict)
+True
+"""
+
 from . import linear_model
 from . import preprocessing
 from . import decomposition
