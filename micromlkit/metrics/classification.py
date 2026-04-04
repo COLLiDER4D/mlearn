@@ -102,6 +102,35 @@ def f1_score(y_true, y_pred):
     
     return 2 * (precision * recall) / (precision + recall)
 
+
+def confusion_matrix(y_true, y_pred):
+    """Compute a confusion matrix for classification predictions.
+
+    Parameters:
+    - y_true: array-like of shape (n_samples,)
+        True labels.
+    - y_pred: array-like of shape (n_samples,)
+        Predicted labels.
+
+    Returns:
+    - cm: ndarray of shape (n_classes, n_classes)
+        Confusion matrix where rows are true classes and columns are predicted classes.
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    if y_true.shape[0] != y_pred.shape[0]:
+        raise ValueError("y_true and y_pred must have the same number of samples.")
+
+    labels = np.unique(np.concatenate((y_true, y_pred)))
+    label_to_index = {label: idx for idx, label in enumerate(labels)}
+    cm = np.zeros((labels.size, labels.size), dtype=int)
+
+    for true_label, pred_label in zip(y_true, y_pred):
+        cm[label_to_index[true_label], label_to_index[pred_label]] += 1
+
+    return cm
+
 def roc_auc_score(y_true, y_scores):
     """Calculate the ROC AUC score of predictions.
     It is the area under the receiver operating characteristic curve.
