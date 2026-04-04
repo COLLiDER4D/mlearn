@@ -58,7 +58,6 @@ class PCA(BaseTransformer):
 		self.mean_ = np.mean(X, axis=0)
 
 		n_components = self._resolve_n_components(n_samples, n_features)
-
 		X_centered = X - self.mean_
 		_, singular_values, vt = np.linalg.svd(X_centered, full_matrices=False)
 
