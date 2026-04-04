@@ -64,7 +64,10 @@ class KNNClassifier(BaseModel, ClassifierMixin):
 		validate_feature_count(X, self.n_features_in_, "KNNClassifier")
 
 		distances = pairwise_distances(X, self.X_train_, metric=self.metric_, p=self.p_)
-		neighbor_indices = np.argsort(distances, axis=1)[:, : self.n_neighbors]
+		neighbor_indices = np.argpartition(distances, kth=self.n_neighbors - 1, axis=1)[:, : self.n_neighbors]
+		neighbor_distances = np.take_along_axis(distances, neighbor_indices, axis=1)
+		neighbor_order = np.argsort(neighbor_distances, axis=1)
+		neighbor_indices = np.take_along_axis(neighbor_indices, neighbor_order, axis=1)
 		neighbor_labels = self.y_train_[neighbor_indices]
 
 		predictions = []

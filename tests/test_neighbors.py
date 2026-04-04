@@ -33,7 +33,7 @@ class TestKNNClassifier(unittest.TestCase):
 
         self.assertEqual(preds.shape, (self.X.shape[0],))
         self.assertEqual(model.n_features_in_, 2)
-        self.assertGreaterEqual(model.score(self.X, self.y), 1.0)
+        self.assertEqual(model.score(self.X, self.y), 1.0)
 
     def test_fit_returns_self(self):
         model = KNNClassifier(n_neighbors=3)
