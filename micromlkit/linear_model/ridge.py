@@ -1,5 +1,12 @@
 import numpy as np
 from ..base import BaseModel, RegressorMixin
+from ..utils.validation import (
+	check_is_fitted,
+	ensure_1d_array,
+	ensure_2d_float_array,
+	ensure_same_n_samples,
+	validate_feature_count,
+)
 
 
 class Ridge(BaseModel, RegressorMixin):
@@ -9,18 +16,13 @@ class Ridge(BaseModel, RegressorMixin):
 		self.alpha = alpha
 
 	def _validate_X_y(self, X, y=None):
-		X = np.asarray(X, dtype=float)
-		if X.ndim != 2:
-			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
+		X = ensure_2d_float_array(X)
 
 		if y is None:
 			return X, None
 
-		y = np.asarray(y, dtype=float)
-		if y.ndim != 1:
-			raise ValueError("y must be a 1D array of shape (n_samples,).")
-		if X.shape[0] != y.shape[0]:
-			raise ValueError("X and y must have the same number of samples.")
+		y = ensure_1d_array(y, dtype=float)
+		ensure_same_n_samples(X, y)
 
 		return X, y
 
@@ -64,15 +66,10 @@ class Ridge(BaseModel, RegressorMixin):
 		- y_pred: array-like of shape (n_samples,)
 			The predicted values.
 		"""
-		if not hasattr(self, "coef_") or not hasattr(self, "intercept_"):
-			raise ValueError("This Ridge instance is not fitted yet. Call 'fit' first.")
+		check_is_fitted(self, ("coef_", "intercept_"))
 
 		X, _ = self._validate_X_y(X, None)
-		if X.shape[1] != self.n_features_in_:
-			raise ValueError(
-				f"X has {X.shape[1]} features, but Ridge was fitted with "
-				f"{self.n_features_in_} features."
-			)
+		validate_feature_count(X, self.n_features_in_, "Ridge")
 
 		y_pred = X @ self.coef_ + self.intercept_
 		return y_pred

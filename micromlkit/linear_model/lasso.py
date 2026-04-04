@@ -1,5 +1,13 @@
 import numpy as np
 from ..base import BaseModel, RegressorMixin
+from ..utils.math import soft_threshold
+from ..utils.validation import (
+	check_is_fitted,
+	ensure_1d_array,
+	ensure_2d_float_array,
+	ensure_same_n_samples,
+	validate_feature_count,
+)
 
 
 class Lasso(BaseModel, RegressorMixin):
@@ -11,27 +19,15 @@ class Lasso(BaseModel, RegressorMixin):
 		self.tol = tol
 
 	def _validate_X_y(self, X, y=None):
-		X = np.asarray(X, dtype=float)
-		if X.ndim != 2:
-			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
+		X = ensure_2d_float_array(X)
 
 		if y is None:
 			return X, None
 
-		y = np.asarray(y, dtype=float)
-		if y.ndim != 1:
-			raise ValueError("y must be a 1D array of shape (n_samples,).")
-		if X.shape[0] != y.shape[0]:
-			raise ValueError("X and y must have the same number of samples.")
+		y = ensure_1d_array(y, dtype=float)
+		ensure_same_n_samples(X, y)
 
 		return X, y
-
-	def _soft_threshold(self, value, threshold):
-		if value > threshold:
-			return value - threshold
-		if value < -threshold:
-			return value + threshold
-		return 0.0
 
 	def fit(self, X, y):
 		"""Fit the lasso regression model to the data.
@@ -75,7 +71,7 @@ class Lasso(BaseModel, RegressorMixin):
 					coef[j] = 0.0
 					continue
 
-				coef[j] = self._soft_threshold(rho, self.alpha * n_samples) / z
+				coef[j] = soft_threshold(rho, self.alpha * n_samples) / z
 
 			max_delta = np.max(np.abs(coef - coef_old))
 			if max_delta < self.tol:
@@ -96,15 +92,10 @@ class Lasso(BaseModel, RegressorMixin):
 		- y_pred: array-like of shape (n_samples,)
 			The predicted values.
 		"""
-		if not hasattr(self, "coef_") or not hasattr(self, "intercept_"):
-			raise ValueError("This Lasso instance is not fitted yet. Call 'fit' first.")
+		check_is_fitted(self, ("coef_", "intercept_"))
 
 		X, _ = self._validate_X_y(X, None)
-		if X.shape[1] != self.n_features_in_:
-			raise ValueError(
-				f"X has {X.shape[1]} features, but Lasso was fitted with "
-				f"{self.n_features_in_} features."
-			)
+		validate_feature_count(X, self.n_features_in_, "Lasso")
 
 		y_pred = X @ self.coef_ + self.intercept_
 		return y_pred

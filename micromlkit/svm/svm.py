@@ -1,45 +1,17 @@
 import numpy as np
 
 from ..base import BaseModel, ClassifierMixin, RegressorMixin
+from ..utils.math import compute_kernel as _compute_kernel
+from ..utils.validation import (
+	validate_non_negative_number as _validate_non_negative_number,
+	validate_positive_integer as _validate_positive_integer,
+	validate_positive_number as _validate_positive_number,
+	validate_random_state as _validate_random_state,
+)
 
 
 _ALLOWED_KERNELS = {"linear", "rbf"}
 _ALLOWED_GAMMA_STRINGS = {"scale", "auto"}
-
-
-def _validate_positive_number(value, name):
-	if isinstance(value, bool) or not isinstance(value, (int, float, np.integer, np.floating)):
-		raise ValueError(f"{name} must be a positive number.")
-	value = float(value)
-	if value <= 0.0:
-		raise ValueError(f"{name} must be a positive number.")
-	return value
-
-
-def _validate_non_negative_number(value, name):
-	if isinstance(value, bool) or not isinstance(value, (int, float, np.integer, np.floating)):
-		raise ValueError(f"{name} must be a non-negative number.")
-	value = float(value)
-	if value < 0.0:
-		raise ValueError(f"{name} must be a non-negative number.")
-	return value
-
-
-def _validate_positive_integer(value, name):
-	if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
-		raise ValueError(f"{name} must be a positive integer.")
-	value = int(value)
-	if value <= 0:
-		raise ValueError(f"{name} must be a positive integer.")
-	return value
-
-
-def _validate_random_state(random_state):
-	if random_state is None:
-		return None
-	if isinstance(random_state, bool) or not isinstance(random_state, (int, np.integer)):
-		raise ValueError("random_state must be an integer or None.")
-	return int(random_state)
 
 
 def _resolve_gamma(gamma, X):
@@ -64,23 +36,6 @@ def _resolve_gamma(gamma, X):
 	if gamma <= 0.0:
 		raise ValueError("gamma must be one of {'scale', 'auto'} or a positive number.")
 	return gamma
-
-
-def _linear_kernel(X, Y):
-	return X @ Y.T
-
-
-def _rbf_kernel(X, Y, gamma):
-	X_norm = np.sum(X ** 2, axis=1, keepdims=True)
-	Y_norm = np.sum(Y ** 2, axis=1, keepdims=True).T
-	squared_distances = np.maximum(X_norm + Y_norm - 2.0 * (X @ Y.T), 0.0)
-	return np.exp(-gamma * squared_distances)
-
-
-def _compute_kernel(X, Y, kernel, gamma):
-	if kernel == "linear":
-		return _linear_kernel(X, Y)
-	return _rbf_kernel(X, Y, gamma)
 
 
 def _fit_binary_kernel_classifier(X, y_binary, C, kernel, gamma, tol, K=None):

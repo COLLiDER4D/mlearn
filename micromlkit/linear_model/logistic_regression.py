@@ -1,5 +1,13 @@
 import numpy as np
 from ..base import BaseModel, ClassifierMixin
+from ..utils.math import sigmoid
+from ..utils.validation import (
+	check_is_fitted,
+	ensure_1d_array,
+	ensure_2d_float_array,
+	ensure_same_n_samples,
+	validate_feature_count,
+)
 
 
 class LogisticRegression(BaseModel, ClassifierMixin):
@@ -11,28 +19,19 @@ class LogisticRegression(BaseModel, ClassifierMixin):
 		self.tol = tol
 
 	def _validate_X_y(self, X, y=None):
-		X = np.asarray(X, dtype=float)
-		if X.ndim != 2:
-			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
+		X = ensure_2d_float_array(X)
 
 		if y is None:
 			return X, None
 
-		y = np.asarray(y, dtype=float)
-		if y.ndim != 1:
-			raise ValueError("y must be a 1D array of shape (n_samples,).")
-		if X.shape[0] != y.shape[0]:
-			raise ValueError("X and y must have the same number of samples.")
+		y = ensure_1d_array(y, dtype=float)
+		ensure_same_n_samples(X, y)
 
 		unique_labels = np.unique(y)
 		if not np.all(np.isin(unique_labels, [0.0, 1.0])):
 			raise ValueError("y must contain binary labels encoded as 0 and 1.")
 
 		return X, y
-
-	def _sigmoid(self, z):
-		z = np.clip(z, -500, 500)
-		return 1.0 / (1.0 + np.exp(-z))
 
 	def fit(self, X, y):
 		"""Fit the logistic regression model to the data.
@@ -53,7 +52,7 @@ class LogisticRegression(BaseModel, ClassifierMixin):
 
 		for _ in range(self.n_iters):
 			linear = X @ self.coef_ + self.intercept_
-			y_pred = self._sigmoid(linear)
+			y_pred = sigmoid(linear)
 
 			error = y_pred - y
 			grad_w = (X.T @ error) / n_samples
@@ -86,17 +85,12 @@ class LogisticRegression(BaseModel, ClassifierMixin):
 		- proba: array-like of shape (n_samples, 2)
 			Class probabilities in the order [P(class=0), P(class=1)].
 		"""
-		if not hasattr(self, "coef_") or not hasattr(self, "intercept_"):
-			raise ValueError("This LogisticRegression instance is not fitted yet. Call 'fit' first.")
+		check_is_fitted(self, ("coef_", "intercept_"))
 
 		X, _ = self._validate_X_y(X, None)
-		if X.shape[1] != self.n_features_in_:
-			raise ValueError(
-				f"X has {X.shape[1]} features, but LogisticRegression was fitted with "
-				f"{self.n_features_in_} features."
-			)
+		validate_feature_count(X, self.n_features_in_, "LogisticRegression")
 
-		proba_pos = self._sigmoid(X @ self.coef_ + self.intercept_)
+		proba_pos = sigmoid(X @ self.coef_ + self.intercept_)
 		proba_neg = 1.0 - proba_pos
 		return np.column_stack((proba_neg, proba_pos))
 

@@ -1,6 +1,7 @@
 import numpy as np
 
 from ..base import BaseTransformer
+from ..utils.validation import check_is_fitted, ensure_2d_float_array, validate_feature_count
 
 
 class StandardScaler(BaseTransformer):
@@ -11,10 +12,7 @@ class StandardScaler(BaseTransformer):
 		self.with_std = with_std
 
 	def _validate_X(self, X):
-		X = np.asarray(X, dtype=float)
-		if X.ndim != 2:
-			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
-		return X
+		return ensure_2d_float_array(X)
 
 	def fit(self, X, y=None):
 		"""Compute scaling statistics from the training data."""
@@ -38,14 +36,9 @@ class StandardScaler(BaseTransformer):
 
 	def transform(self, X):
 		"""Scale features of X according to previously computed statistics."""
-		if not hasattr(self, "mean_") or not hasattr(self, "scale_"):
-			raise ValueError("This StandardScaler instance is not fitted yet. Call 'fit' first.")
+		check_is_fitted(self, ("mean_", "scale_"))
 
 		X = self._validate_X(X)
-		if X.shape[1] != self.n_features_in_:
-			raise ValueError(
-				f"X has {X.shape[1]} features, but StandardScaler was fitted with "
-				f"{self.n_features_in_} features."
-			)
+		validate_feature_count(X, self.n_features_in_, "StandardScaler")
 
 		return (X - self.mean_) / self.scale_
