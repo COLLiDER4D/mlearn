@@ -4,6 +4,7 @@ from . import decomposition
 from . import cluster
 from . import neighbors
 from . import pipeline
+from . import tree
 
 __all__ = [
 	"linear_model",
@@ -12,4 +13,5 @@ __all__ = [
 	"cluster",
 	"neighbors",
 	"pipeline",
+	"tree",
 ]
