@@ -97,6 +97,16 @@ class TestPipeline(unittest.TestCase):
         with self.assertRaises(ValueError):
             Pipeline(steps=[("bad", InvalidTransformer()), ("model", FirstColumnEstimator())])
 
+    def test_reserved_step_name_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            Pipeline(steps=[("steps", DoubleTransformer()), ("model", FirstColumnEstimator())])
+        self.assertIn("reserved", str(ctx.exception))
+
+    def test_step_name_with_double_underscore_raises(self):
+        with self.assertRaises(ValueError) as ctx:
+            Pipeline(steps=[("my__step", DoubleTransformer()), ("model", FirstColumnEstimator())])
+        self.assertIn("__", str(ctx.exception))
+
     def test_named_steps_and_nested_set_params(self):
         model = FirstColumnEstimator(offset=0.0)
         pipe = Pipeline(steps=[("scale", DoubleTransformer()), ("model", model)])

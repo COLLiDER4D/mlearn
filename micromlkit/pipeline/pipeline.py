@@ -38,6 +38,15 @@ class Pipeline(BaseEstimator):
 			name, step = item
 			if not isinstance(name, str) or not name:
 				raise ValueError("Each step name must be a non-empty string.")
+			if name == "steps":
+				raise ValueError(
+					"Step name 'steps' is reserved by the Pipeline and cannot be used."
+				)
+			if "__" in name:
+				raise ValueError(
+					f"Step name '{name}' must not contain '__', as it conflicts with "
+					"the nested parameter convention (name__param)."
+				)
 			if name in seen_names:
 				raise ValueError(f"Step names must be unique. Duplicate name: '{name}'.")
 			seen_names.add(name)
