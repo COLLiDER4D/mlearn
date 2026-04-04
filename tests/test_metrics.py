@@ -11,7 +11,7 @@ ROOT_PARENT = Path(__file__).resolve().parents[2]
 if str(ROOT_PARENT) not in sys.path:
     sys.path.insert(0, str(ROOT_PARENT))
 
-from mlearn.metrics.classification import (
+from src.metrics.classification import (
     accuracy_score,
     f1_score,
     log_loss,
@@ -19,7 +19,7 @@ from mlearn.metrics.classification import (
     recall_score,
     roc_auc_score,
 )
-from mlearn.metrics.regression import (
+from src.metrics.regression import (
     mean_absolute_error,
     mean_absolute_percentage_error,
     mean_squared_error,

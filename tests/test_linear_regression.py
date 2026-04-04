@@ -10,7 +10,7 @@ ROOT_PARENT = Path(__file__).resolve().parents[2]
 if str(ROOT_PARENT) not in sys.path:
     sys.path.insert(0, str(ROOT_PARENT))
 
-from mlearn.linear_model.linear_regression import LinearRegression
+from src.linear_model.linear_regression import LinearRegression
 
 
 class TestLinearRegression(unittest.TestCase):

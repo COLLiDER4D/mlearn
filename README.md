@@ -9,10 +9,10 @@ This project is designed for learning and experimentation rather than production
 ### Verified implemented pieces
 
 - [x] Package metadata for `microMlKit` with Python `>=3.9`
-- [x] Core estimator and mixin base classes in `mlearn/base.py`
-- [x] Regression metrics in `mlearn/metrics/regression.py`
-- [x] Train/test splitting and cross-validation helpers in `mlearn/model_selection/`
-- [x] Grid search utilities in `mlearn/model_selection/search.py`
+- [x] Core estimator and mixin base classes in `microMlKit/base.py`
+- [x] Regression metrics in `microMlKit/metrics/regression.py`
+- [x] Train/test splitting and cross-validation helpers in `microMlKit/model_selection/`
+- [x] Grid search utilities in `microMlKit/model_selection/search.py`
 - [x] Source modules present for linear models, tree models, clustering, ensembles, neighbors, SVM, preprocessing, decomposition, and tests
 
 ### Verified incomplete or not yet implemented
@@ -22,7 +22,7 @@ This project is designed for learning and experimentation rather than production
 - [ ] Named pipeline steps
 - [ ] Fit/transform chaining improvements
 - [ ] Caching support for pipelines
-- [ ] A complete pipeline implementation in `mlearn/pipeline/pipeline.py` (currently empty)
+- [ ] A complete pipeline implementation in `microMlKit/pipeline/pipeline.py` (currently empty)
 
 ## Installation
 
@@ -43,9 +43,9 @@ pip install -r requirements.txt
 ### Linear regression example
 
 <pre><code class="language-python">import numpy as np
-from mlearn.linear_model.linear_regression import LinearRegression
-from mlearn.metrics.regression import mean_squared_error, r2_score
-from mlearn.model_selection.split import train_test_split
+from src.linear_model.linear_regression import LinearRegression
+from src.metrics.regression import mean_squared_error, r2_score
+from src.model_selection.split import train_test_split
 
 # Sample data
 X = np.array([[1.0], [2.0], [3.0], [4.0], [5.0]])
@@ -69,7 +69,7 @@ print("R2:", r2_score(y_test, predictions))</code></pre>
 
 ## Module Highlights
 
-### `mlearn/base.py`
+### `microMlKit/base.py`
 
 Core abstractions and mixins:
 
@@ -82,54 +82,54 @@ Core abstractions and mixins:
 - `ClusterMixin`
 - `BasePipeline`
 
-### `mlearn/linear_model/`
+### `microMlKit/linear_model/`
 
 - `LinearRegression`
 - `Lasso`
 - `Ridge`
 - `LogisticRegression`
 
-### `mlearn/tree/`
+### `microMlKit/tree/`
 
 - Decision tree classifiers and regressors
 
-### `mlearn/cluster/`
+### `microMlKit/cluster/`
 
 - `KMeans`
 - `DBSCAN`
 - `Agglomerative` clustering
 
-### `mlearn/ensemble/`
+### `microMlKit/ensemble/`
 
 - `RandomForest`
 - `GradientBoosting`
 
-### `mlearn/neighbors/`
+### `microMlKit/neighbors/`
 
 - K-nearest neighbors classifier and regressor
 
-### `mlearn/svm/`
+### `microMlKit/svm/`
 
 - Support vector machine utilities and models
 
-### `mlearn/preprocessing/`
+### `microMlKit/preprocessing/`
 
 - Encoders
 - Imputers
 - Scalers
 
-### `mlearn/metrics/`
+### `microMlKit/metrics/`
 
 - Regression metrics such as `r2_score`, `mean_squared_error`, `root_mean_squared_error`, `mean_absolute_error`, and `mean_absolute_percentage_error`
 
-### `mlearn/model_selection/`
+### `microMlKit/model_selection/`
 
 - `train_test_split`
 - `KFold`
 - `StratifiedKFold`
 - Search helpers
 
-### `mlearn/decomposition/`
+### `microMlKit/decomposition/`
 
 - `PCA`
 

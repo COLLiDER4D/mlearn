@@ -7,7 +7,7 @@ import numpy as np
 
 # Ensure imports work with this repository's current package layout.
 ROOT_PARENT = Path(__file__).resolve().parents[2]  # .../capstone
-PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/mlearn
+PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/microMlKit
 for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
