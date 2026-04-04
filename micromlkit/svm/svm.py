@@ -83,8 +83,9 @@ def _compute_kernel(X, Y, kernel, gamma):
 	return _rbf_kernel(X, Y, gamma)
 
 
-def _fit_binary_kernel_classifier(X, y_binary, C, kernel, gamma, tol):
-	K = _compute_kernel(X, X, kernel=kernel, gamma=gamma)
+def _fit_binary_kernel_classifier(X, y_binary, C, kernel, gamma, tol, K=None):
+	if K is None:
+		K = _compute_kernel(X, X, kernel=kernel, gamma=gamma)
 	regularization = 1.0 / C
 	system = K + regularization * np.eye(K.shape[0])
 	beta = np.linalg.solve(system, y_binary)
@@ -109,63 +110,139 @@ def _fit_binary_kernel_classifier(X, y_binary, C, kernel, gamma, tol):
 	return model
 
 
-def _fit_kernel_regressor(X, y, C, epsilon, kernel, gamma, tol):
-	if kernel == "linear":
-		regularization = 1.0 / C
-		X_mean = np.mean(X, axis=0)
-		y_mean = float(np.mean(y))
-		X_centered = X - X_mean
-		y_centered = y - y_mean
+def _fit_epsilon_insensitive_kernel_regressor(X, y, C, epsilon, kernel, gamma, tol, max_iter=100):
+	regularization = 1.0 / C
+	n_samples = X.shape[0]
 
-		system = X_centered.T @ X_centered + regularization * np.eye(X.shape[1])
-		coef = np.linalg.solve(system, X_centered.T @ y_centered)
-		bias = float(y_mean - X_mean @ coef)
+	if kernel == "linear":
+		X_aug = np.hstack([X, np.ones((n_samples, 1))])
+		reg_matrix = np.eye(X_aug.shape[1])
+		reg_matrix[-1, -1] = 0.0
+
+		initial_system = X_aug.T @ X_aug + regularization * reg_matrix
+		initial_solution = np.linalg.solve(initial_system, X_aug.T @ y)
+		coef = initial_solution[:-1]
+		bias = float(initial_solution[-1])
+
+		previous_active = None
+		for _ in range(max_iter):
+			train_predictions = X @ coef + bias
+			signed_residual = y - train_predictions
+			active = np.abs(signed_residual) > epsilon + tol
+
+			if not np.any(active):
+				break
+
+			sign = np.sign(signed_residual[active])
+			adjusted_targets = y[active] - epsilon * sign
+			X_active = X[active]
+			X_active_aug = np.hstack([X_active, np.ones((X_active.shape[0], 1))])
+
+			system = X_active_aug.T @ X_active_aug + regularization * reg_matrix
+			solution = np.linalg.solve(system, X_active_aug.T @ adjusted_targets)
+			new_coef = solution[:-1]
+			new_bias = float(solution[-1])
+
+			if (
+				previous_active is not None
+				and np.array_equal(active, previous_active)
+				and np.allclose(new_coef, coef, atol=tol, rtol=0.0)
+				and abs(new_bias - bias) <= tol
+			):
+				coef = new_coef
+				bias = new_bias
+				break
+
+			coef = new_coef
+			bias = new_bias
+			previous_active = active.copy()
 
 		# Recover a sample-space coefficient vector for consistent SVM-style attributes.
 		beta = np.linalg.lstsq(X.T, coef, rcond=None)[0]
-
-		train_predictions = X @ coef + bias
-		residual = np.abs(y - train_predictions)
-		support_mask = (np.abs(beta) > tol) | (residual >= max(epsilon - tol, 0.0))
-		support_indices = np.flatnonzero(support_mask)
-		if support_indices.size == 0:
-			support_indices = np.arange(X.shape[0], dtype=int)
-
 		return {
 			"X_train": X,
 			"beta": beta,
 			"bias": bias,
-			"support_indices": support_indices,
 			"kernel": kernel,
 			"gamma": gamma,
 			"coef": coef,
 		}
 
 	K = _compute_kernel(X, X, kernel=kernel, gamma=gamma)
-	regularization = 1.0 / C
-	system = K + regularization * np.eye(K.shape[0])
-	beta = np.linalg.solve(system, y)
+	initial_system = K + regularization * np.eye(n_samples)
+	beta = np.linalg.solve(initial_system, y)
 	bias = float(np.mean(y - K @ beta))
 
-	train_predictions = K @ beta + bias
-	residual = np.abs(y - train_predictions)
-	support_mask = (np.abs(beta) > tol) | (residual >= max(epsilon - tol, 0.0))
-	support_indices = np.flatnonzero(support_mask)
-	if support_indices.size == 0:
-		support_indices = np.arange(X.shape[0], dtype=int)
+	previous_active = None
+	for _ in range(max_iter):
+		train_predictions = K @ beta + bias
+		signed_residual = y - train_predictions
+		active = np.abs(signed_residual) > epsilon + tol
 
-	model = {
+		if not np.any(active):
+			break
+
+		sign = np.sign(signed_residual[active])
+		adjusted_targets = y[active] - epsilon * sign
+		K_active = K[active, :]
+		ones_active = np.ones((K_active.shape[0], 1))
+
+		top_left = K_active.T @ K_active + regularization * K
+		top_right = K_active.T @ ones_active
+		bottom_left = top_right.T
+		bottom_right = np.array([[float(K_active.shape[0])]])
+		system = np.block([
+			[top_left, top_right],
+			[bottom_left, bottom_right],
+		])
+		rhs = np.concatenate([K_active.T @ adjusted_targets, np.array([np.sum(adjusted_targets)])])
+		solution = np.linalg.solve(system, rhs)
+		new_beta = solution[:-1]
+		new_bias = float(solution[-1])
+
+		if (
+			previous_active is not None
+			and np.array_equal(active, previous_active)
+			and np.allclose(new_beta, beta, atol=tol, rtol=0.0)
+			and abs(new_bias - bias) <= tol
+		):
+			beta = new_beta
+			bias = new_bias
+			break
+
+		beta = new_beta
+		bias = new_bias
+		previous_active = active.copy()
+
+	return {
 		"X_train": X,
 		"beta": beta,
 		"bias": bias,
-		"support_indices": support_indices,
 		"kernel": kernel,
 		"gamma": gamma,
 	}
 
-	if kernel == "linear":
-		model["coef"] = X.T @ beta
 
+def _fit_kernel_regressor(X, y, C, epsilon, kernel, gamma, tol, max_iter=100):
+	model = _fit_epsilon_insensitive_kernel_regressor(
+		X,
+		y,
+		C,
+		epsilon,
+		kernel,
+		gamma,
+		tol,
+		max_iter=max_iter,
+	)
+
+	train_predictions = _decision_function(model, X)
+	residual = np.abs(y - train_predictions)
+	support_mask = (np.abs(model["beta"]) > tol) | (residual >= max(epsilon - tol, 0.0))
+	support_indices = np.flatnonzero(support_mask)
+	if support_indices.size == 0:
+		support_indices = np.arange(X.shape[0], dtype=int)
+
+	model["support_indices"] = support_indices
 	return model
 
 
@@ -204,8 +281,10 @@ class SVC(BaseModel, ClassifierMixin):
 			self.gamma_ = _validate_positive_number(self.gamma, "gamma")
 
 		self.tol_ = _validate_positive_number(self.tol, "tol")
-		self.max_iter_ = _validate_positive_integer(self.max_iter, "max_iter")
-		self.random_state_ = _validate_random_state(self.random_state)
+		# Validate for API compatibility; these parameters are not currently used
+		# by the underlying training implementation.
+		_validate_positive_integer(self.max_iter, "max_iter")
+		_validate_random_state(self.random_state)
 
 	def _validate_X_y(self, X, y=None):
 		X = np.asarray(X, dtype=float)
@@ -252,6 +331,7 @@ class SVC(BaseModel, ClassifierMixin):
 			self.models_ = [model]
 		else:
 			models = []
+			K_precomputed = _compute_kernel(X, X, kernel=self.kernel_, gamma=gamma_value)
 			for cls in self.classes_:
 				y_binary = np.where(y == cls, 1.0, -1.0)
 				model = _fit_binary_kernel_classifier(
@@ -261,6 +341,7 @@ class SVC(BaseModel, ClassifierMixin):
 					kernel=self.kernel_,
 					gamma=gamma_value,
 					tol=self.tol_,
+					K=K_precomputed,
 				)
 				models.append(model)
 			self.models_ = models
@@ -297,8 +378,12 @@ class SVC(BaseModel, ClassifierMixin):
 		if self.classes_.size == 2:
 			return _decision_function(self.models_[0], X)
 
-		scores = np.column_stack([_decision_function(model, X) for model in self.models_])
-		return scores
+		# Precompute the kernel matrix once and reuse it across all OvR models.
+		ref = self.models_[0]
+		K = _compute_kernel(X, ref["X_train"], kernel=ref["kernel"], gamma=ref["gamma"])
+		betas = np.column_stack([m["beta"] for m in self.models_])
+		biases = np.array([m["bias"] for m in self.models_], dtype=float)
+		return K @ betas + biases
 
 	def predict(self, X):
 		"""Predict class labels for samples in X."""
@@ -354,7 +439,9 @@ class SVR(BaseModel, RegressorMixin):
 
 		self.tol_ = _validate_positive_number(self.tol, "tol")
 		self.max_iter_ = _validate_positive_integer(self.max_iter, "max_iter")
-		self.random_state_ = _validate_random_state(self.random_state)
+		# Validate for API compatibility; random_state is not currently used
+		# by the underlying training implementation.
+		_validate_random_state(self.random_state)
 
 	def _validate_X_y(self, X, y=None):
 		X = np.asarray(X, dtype=float)
@@ -391,6 +478,7 @@ class SVR(BaseModel, RegressorMixin):
 			kernel=self.kernel_,
 			gamma=gamma_value,
 			tol=self.tol_,
+			max_iter=self.max_iter_,
 		)
 
 		self.X_train_ = model["X_train"]
