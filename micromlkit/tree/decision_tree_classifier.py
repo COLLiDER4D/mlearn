@@ -86,7 +86,9 @@ class DecisionTreeClassifier(BaseModel, ClassifierMixin):
 		best_threshold = None
 		best_left_mask = None
 
-		for feature_index in range(n_features):
+		feature_indices = self._rng.permutation(n_features) if self.random_state is not None else range(n_features)
+
+		for feature_index in feature_indices:
 			feature_values = X[:, feature_index]
 			unique_values = np.unique(feature_values)
 			if unique_values.size <= 1:
@@ -125,38 +127,49 @@ class DecisionTreeClassifier(BaseModel, ClassifierMixin):
 		return best_feature, best_threshold, best_left_mask
 
 	def _build_tree(self, X, y, depth):
-		n_samples = X.shape[0]
-		node_count = 1
+		node_count = 0
+		max_depth_seen = depth
+		root = None
+		stack = [(X, y, depth, None, None)]
 
-		should_stop = (
-			(self.max_depth is not None and depth >= self.max_depth)
-			or (n_samples < self.min_samples_split)
-			or (np.unique(y).size == 1)
-		)
+		while stack:
+			X_node, y_node, node_depth, parent, branch = stack.pop()
+			n_samples = X_node.shape[0]
+			node_count += 1
+			max_depth_seen = max(max_depth_seen, node_depth)
 
-		if should_stop:
-			leaf = {"is_leaf": True, "value": self._majority_class(y)}
-			return leaf, node_count, depth
+			should_stop = (
+				(self.max_depth is not None and node_depth >= self.max_depth)
+				or (n_samples < self.min_samples_split)
+				or (np.unique(y_node).size == 1)
+			)
 
-		parent_impurity = self._impurity(y)
-		feature_index, threshold, left_mask = self._best_split(X, y, parent_impurity)
+			if should_stop:
+				node = {"is_leaf": True, "value": self._majority_class(y_node)}
+			else:
+				parent_impurity = self._impurity(y_node)
+				feature_index, threshold, left_mask = self._best_split(X_node, y_node, parent_impurity)
 
-		if feature_index is None:
-			leaf = {"is_leaf": True, "value": self._majority_class(y)}
-			return leaf, node_count, depth
+				if feature_index is None:
+					node = {"is_leaf": True, "value": self._majority_class(y_node)}
+				else:
+					node = {
+						"is_leaf": False,
+						"feature_index": int(feature_index),
+						"threshold": float(threshold),
+						"left": None,
+						"right": None,
+					}
 
-		left_node, left_count, left_depth = self._build_tree(X[left_mask], y[left_mask], depth + 1)
-		right_node, right_count, right_depth = self._build_tree(X[~left_mask], y[~left_mask], depth + 1)
+					stack.append((X_node[~left_mask], y_node[~left_mask], node_depth + 1, node, "right"))
+					stack.append((X_node[left_mask], y_node[left_mask], node_depth + 1, node, "left"))
 
-		node = {
-			"is_leaf": False,
-			"feature_index": int(feature_index),
-			"threshold": float(threshold),
-			"left": left_node,
-			"right": right_node,
-		}
-		node_count += left_count + right_count
-		return node, node_count, max(left_depth, right_depth)
+			if parent is None:
+				root = node
+			else:
+				parent[branch] = node
+
+		return root, node_count, max_depth_seen
 
 	def fit(self, X, y):
 		"""Fit the decision tree classifier."""
@@ -166,6 +179,7 @@ class DecisionTreeClassifier(BaseModel, ClassifierMixin):
 		if X.shape[0] == 0:
 			raise ValueError("X must contain at least one sample.")
 
+		self._rng = np.random.default_rng(self.random_state)
 		self.n_features_in_ = X.shape[1]
 		self.classes_ = np.unique(y)
 		self.tree_, self.n_nodes_, self.depth_ = self._build_tree(X, y, depth=0)

@@ -85,7 +85,9 @@ class DecisionTreeRegressor(BaseModel, RegressorMixin):
 		best_threshold = None
 		best_left_mask = None
 
-		for feature_index in range(n_features):
+		feature_indices = self._rng.permutation(n_features) if self.random_state is not None else range(n_features)
+
+		for feature_index in feature_indices:
 			feature_values = X[:, feature_index]
 			unique_values = np.unique(feature_values)
 			if unique_values.size <= 1:
@@ -124,38 +126,49 @@ class DecisionTreeRegressor(BaseModel, RegressorMixin):
 		return best_feature, best_threshold, best_left_mask
 
 	def _build_tree(self, X, y, depth):
-		n_samples = X.shape[0]
-		node_count = 1
+		root = {}
+		node_count = 0
+		max_depth_seen = depth
+		stack = [(root, X, y, depth)]
 
-		should_stop = (
-			(self.max_depth is not None and depth >= self.max_depth)
-			or (n_samples < self.min_samples_split)
-			or np.allclose(y, y[0])
-		)
+		while stack:
+			node, X_node, y_node, node_depth = stack.pop()
+			n_samples = X_node.shape[0]
+			node_count += 1
+			if node_depth > max_depth_seen:
+				max_depth_seen = node_depth
 
-		if should_stop:
-			leaf = {"is_leaf": True, "value": self._leaf_value(y)}
-			return leaf, node_count, depth
+			should_stop = (
+				(self.max_depth is not None and node_depth >= self.max_depth)
+				or (n_samples < self.min_samples_split)
+				or np.allclose(y_node, y_node[0])
+			)
 
-		parent_impurity = self._impurity(y)
-		feature_index, threshold, left_mask = self._best_split(X, y, parent_impurity)
+			if should_stop:
+				node["is_leaf"] = True
+				node["value"] = self._leaf_value(y_node)
+				continue
 
-		if feature_index is None:
-			leaf = {"is_leaf": True, "value": self._leaf_value(y)}
-			return leaf, node_count, depth
+			parent_impurity = self._impurity(y_node)
+			feature_index, threshold, left_mask = self._best_split(X_node, y_node, parent_impurity)
 
-		left_node, left_count, left_depth = self._build_tree(X[left_mask], y[left_mask], depth + 1)
-		right_node, right_count, right_depth = self._build_tree(X[~left_mask], y[~left_mask], depth + 1)
+			if feature_index is None:
+				node["is_leaf"] = True
+				node["value"] = self._leaf_value(y_node)
+				continue
 
-		node = {
-			"is_leaf": False,
-			"feature_index": int(feature_index),
-			"threshold": float(threshold),
-			"left": left_node,
-			"right": right_node,
-		}
-		node_count += left_count + right_count
-		return node, node_count, max(left_depth, right_depth)
+			left_node = {}
+			right_node = {}
+			node["is_leaf"] = False
+			node["feature_index"] = int(feature_index)
+			node["threshold"] = float(threshold)
+			node["left"] = left_node
+			node["right"] = right_node
+
+			stack.append((right_node, X_node[~left_mask], y_node[~left_mask], node_depth + 1))
+			stack.append((left_node, X_node[left_mask], y_node[left_mask], node_depth + 1))
+
+		return root, node_count, max_depth_seen
 
 	def fit(self, X, y):
 		"""Fit the decision tree regressor."""
@@ -165,6 +178,7 @@ class DecisionTreeRegressor(BaseModel, RegressorMixin):
 		if X.shape[0] == 0:
 			raise ValueError("X must contain at least one sample.")
 
+		self._rng = np.random.default_rng(self.random_state)
 		self.n_features_in_ = X.shape[1]
 		self.tree_, self.n_nodes_, self.depth_ = self._build_tree(X, y, depth=0)
 		return self

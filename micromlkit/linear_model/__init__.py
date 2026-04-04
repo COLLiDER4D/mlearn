@@ -6,5 +6,5 @@ __all__ = [
 	"LinearRegression",
 	"Ridge",
 	"Lasso",
-    "LogisticRegression"
+	"LogisticRegression"
 ]
