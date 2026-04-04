@@ -138,14 +138,12 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/decomposition/__init__.py`
 - [x] `micromlkit/pipeline/pipeline.py`
 - [x] `micromlkit/pipeline/__init__.py`
+- [x] `micromlkit/cluster/agglomerative.py`
+- [x] `micromlkit/cluster/dbscan.py`
+- [x] `micromlkit/cluster/kmeans.py`
+- [x] `micromlkit/cluster/__init__.py`
 
 ### Pending implementation (empty files)
-
-#### Cluster
-- [ ] `micromlkit/cluster/agglomerative.py`
-- [ ] `micromlkit/cluster/dbscan.py`
-- [ ] `micromlkit/cluster/kmeans.py`
-- [ ] `micromlkit/cluster/__init__.py` (exports)
 
 #### Ensemble
 - [ ] `micromlkit/ensemble/random_forest.py`
