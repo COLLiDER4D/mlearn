@@ -133,6 +133,8 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/preprocessing/imputer.py`
 - [x] `micromlkit/preprocessing/scaler.py`
 - [x] `micromlkit/preprocessing/__init__.py`
+- [x] `micromlkit/decomposition/pca.py`
+- [x] `micromlkit/decomposition/__init__.py`
 
 ### Pending implementation (empty files)
 
@@ -141,10 +143,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/cluster/dbscan.py`
 - [ ] `micromlkit/cluster/kmeans.py`
 - [ ] `micromlkit/cluster/__init__.py` (exports)
-
-#### Decomposition
-- [ ] `micromlkit/decomposition/pca.py`
-- [ ] `micromlkit/decomposition/__init__.py` (exports)
 
 #### Ensemble
 - [ ] `micromlkit/ensemble/random_forest.py`
