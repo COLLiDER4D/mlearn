@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0","wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,4 +9,13 @@ description = "Mini machine learning library"
 authors = [{ name = "Probal Deep Saikia", email="probaldeepsaikia@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "numpy",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "flake8"
+]
