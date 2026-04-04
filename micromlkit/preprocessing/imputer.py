@@ -18,7 +18,8 @@ class SimpleImputer(BaseTransformer):
 		if X_obj.ndim != 2:
 			raise ValueError("X must be a 2D array of shape (n_samples, n_features).")
 
-		missing_mask = np.vectorize(self._is_missing)(X_obj)
+		# np.not_equal(X_obj, X_obj) detects NaN values (NaN != NaN is True)
+		missing_mask = np.equal(X_obj, None) | np.not_equal(X_obj, X_obj)
 		return X_obj, missing_mask
 
 	def fit(self, X, y=None):

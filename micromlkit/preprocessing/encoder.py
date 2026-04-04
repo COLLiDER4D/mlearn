@@ -44,12 +44,17 @@ class LabelEncoder(BaseTransformer):
 
 		indices = np.asarray(X)
 		if indices.ndim != 1:
-			raise ValueError("y must be a 1D array of shape (n_samples,).")
+			raise ValueError("X must be a 1D array of shape (n_samples,).")
 
 		if not np.issubdtype(indices.dtype, np.integer):
-			if np.any(indices != np.floor(indices)):
+			try:
+				float_indices = indices.astype(float)
+			except (TypeError, ValueError):
+				raise ValueError("Encoded labels must be numeric integers.")
+
+			if np.any(float_indices != np.floor(float_indices)):
 				raise ValueError("Encoded labels must be integers.")
-			indices = indices.astype(int)
+			indices = float_indices.astype(int)
 
 		if np.any(indices < 0) or np.any(indices >= len(self.classes_)):
 			raise ValueError("Encoded labels are out of range.")
