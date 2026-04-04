@@ -128,7 +128,7 @@ class TestSearch(unittest.TestCase):
         def fake_cross_val_score(estimator, X, y, cv):
             return score_map[estimator.threshold]
 
-        with patch("src.model_selection.search.cross_val_score", side_effect=fake_cross_val_score):
+        with patch("micromlkit.model_selection.search.cross_val_score", side_effect=fake_cross_val_score):
             gs = GridSearchCV(estimator=est, param_grid={"threshold": [0.2, 0.5, 0.8]}, cv=2)
             gs.fit(X, y)
 
