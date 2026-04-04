@@ -19,16 +19,10 @@ It includes:
 
 ## Installation
 
-From the repository root:
+Install from PyPI:
 
 ```bash
-pip install -e .
-```
-
-Or install dependencies only:
-
-```bash
-pip install -r requirements.txt
+pip install micromlkit==0.1.0
 ```
 
 ## Quick start
