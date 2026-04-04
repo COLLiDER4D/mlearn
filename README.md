@@ -136,6 +136,8 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/preprocessing/__init__.py`
 - [x] `micromlkit/decomposition/pca.py`
 - [x] `micromlkit/decomposition/__init__.py`
+- [x] `micromlkit/pipeline/pipeline.py`
+- [x] `micromlkit/pipeline/__init__.py`
 
 ### Pending implementation (empty files)
 
@@ -154,10 +156,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/neighbors/knn_classifier.py`
 - [ ] `micromlkit/neighbors/knn_regressor.py`
 - [ ] `micromlkit/neighbors/__init__.py` (exports)
-
-#### Pipeline
-- [ ] `micromlkit/pipeline/pipeline.py`
-- [ ] `micromlkit/pipeline/__init__.py` (exports)
 
 #### SVM
 - [ ] `micromlkit/svm/svm.py`
