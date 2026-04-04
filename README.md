@@ -129,6 +129,7 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/model_selection/split.py`
 - [x] `micromlkit/model_selection/cross_validation.py`
 - [x] `micromlkit/model_selection/search.py`
+- [x] `micromlkit/model_selection/__init__.py`
 - [x] `micromlkit/preprocessing/encoder.py`
 - [x] `micromlkit/preprocessing/imputer.py`
 - [x] `micromlkit/preprocessing/scaler.py`
@@ -171,9 +172,6 @@ Status below is based on current source files in `micromlkit/`.
 - [ ] `micromlkit/utils/math.py`
 - [ ] `micromlkit/utils/validation.py`
 - [ ] `micromlkit/utils/__init__.py` (exports)
-
-#### Model selection package init
-- [ ] `micromlkit/model_selection/__init__.py` (exports)
 
 ## Project layout
 
