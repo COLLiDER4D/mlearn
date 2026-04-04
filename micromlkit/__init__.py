@@ -6,6 +6,7 @@ from . import neighbors
 from . import pipeline
 from . import tree
 from . import svm
+from . import ensemble
 
 __all__ = [
 	"linear_model",
@@ -16,4 +17,5 @@ __all__ = [
 	"pipeline",
 	"tree",
 	"svm",
+	"ensemble",
 ]
