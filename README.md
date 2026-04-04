@@ -150,13 +150,11 @@ Status below is based on current source files in `micromlkit/`.
 - [x] `micromlkit/tree/__init__.py`
 - [x] `micromlkit/svm/svm.py`
 - [x] `micromlkit/svm/__init__.py`
+- [x] `micromlkit/ensemble/random_forest.py`
+- [x] `micromlkit/ensemble/gradient_boosting.py`
+- [x] `micromlkit/ensemble/__init__.py`
 
 ### Pending implementation (empty files)
-
-#### Ensemble
-- [ ] `micromlkit/ensemble/random_forest.py`
-- [ ] `micromlkit/ensemble/gradient_boosting.py`
-- [ ] `micromlkit/ensemble/__init__.py` (exports)
 
 #### Utils
 - [ ] `micromlkit/utils/math.py`
