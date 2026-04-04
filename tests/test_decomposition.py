@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 
 # Ensure package import works when running tests from repository root.
-ROOT_PARENT = Path(__file__).resolve().parents[2]  # .../capstone
-PKG_ROOT = Path(__file__).resolve().parents[1]     # .../capstone/microMlKit
+ROOT_PARENT = Path(__file__).resolve().parents[2]  # repository parent directory
+PKG_ROOT = Path(__file__).resolve().parents[1]     # repository root directory
 for p in (ROOT_PARENT, PKG_ROOT):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
@@ -73,7 +73,7 @@ class TestPCA(unittest.TestCase):
             [5.0, 6.0],
         ])
 
-        invalid_values = [0, -1, 3, 1.5, "2"]
+        invalid_values = [0, -1, 3, 1.5, "2", True, False]
         for value in invalid_values:
             with self.subTest(n_components=value):
                 with self.assertRaises(ValueError):

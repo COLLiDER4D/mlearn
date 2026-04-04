@@ -29,6 +29,9 @@ class PCA(BaseTransformer):
 		if self.n_components is None:
 			return max_components
 
+		if isinstance(self.n_components, bool):
+			raise ValueError("n_components must be an integer or None.")
+
 		if not isinstance(self.n_components, (int, np.integer)):
 			raise ValueError("n_components must be an integer or None.")
 
@@ -54,10 +57,10 @@ class PCA(BaseTransformer):
 		self.n_samples_seen_ = n_samples
 		self.mean_ = np.mean(X, axis=0)
 
+		n_components = self._resolve_n_components(n_samples, n_features)
+
 		X_centered = X - self.mean_
 		_, singular_values, vt = np.linalg.svd(X_centered, full_matrices=False)
-
-		n_components = self._resolve_n_components(n_samples, n_features)
 
 		if n_samples > 1:
 			full_explained_variance = (singular_values ** 2) / (n_samples - 1)
